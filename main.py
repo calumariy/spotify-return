@@ -18,8 +18,8 @@ client_secret = os.getenv("CLIENT_SECRET")
 auth_headers = {
     "client_id": client_id,
     "response_type": "code",
-    "redirect_uri": "https://localhost:3000",
-    "scope": "user-library-read"
+    "redirect_uri": "https://localhost:3000/callback",
+    "scope": "user-library-read, user-top-read"
 }
 
 driver.get("https://accounts.spotify.com/authorize?" + urlencode(auth_headers))
@@ -38,7 +38,7 @@ def get_token(token_data):
     json_result = json.loads(result.content)
     token = json_result["access_token"]
     return token
-
+ 
 def get_auth_header(token):
     return {"Authorization": "Bearer " + token}
 
@@ -64,9 +64,10 @@ def search_for_user(token, user_name):
     result = get(query_url, headers=headers)
     json_result = json.loads(result.content)
     return json_result
+
 while driver.current_url[8:13] != "local":
     time.sleep(1)
 code = driver.current_url.split("=")[1]
-token_data = {"grant_type": "authorization_code", "code": code, "redirect_uri": "https://localhost:3000"}
+token_data = {"grant_type": "authorization_code", "code": code, "redirect_uri": "https://localhost:3000/callback"}
 token = get_token(token_data)
 print(search_for_top(token))
